@@ -2,8 +2,11 @@ package restify
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/yhat/scrape"
@@ -24,9 +27,49 @@ func WithHeaders(headers map[string]string) RequestConfig {
 	}
 }
 
+// LoadFile retrieves the HTML content from the given file URL.
+func LoadBuffer(buffer []byte) (*html.Node, error) {
+	root, err := html.Parse(strings.NewReader(string(buffer)))
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse buffer: %w", err)
+	}
+
+	return root, nil
+}
+
+func LoadReader(reader *io.Reader) (*html.Node, error) {
+	root, err := html.Parse(*reader)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse reader: %w", err)
+	}
+
+	return root, nil
+}
+
+func LoadFile(url *url.URL, userAgent string, configs ...RequestConfig) (*html.Node, error) {
+
+	// open the file as a io.reader
+	filePointer, err := os.Open(url.Path)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to open file: %w", err)
+	}
+	//goland:noinspection GoUnhandledErrorResult
+
+	root, err := html.Parse(filePointer)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse file: %w", err)
+	}
+
+	return root, nil
+}
+
 // LoadContent retrieves the HTML content from the given url.
 // The userAgent is optional, but if provided should conform with https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent
 func LoadContent(url *url.URL, userAgent string, configs ...RequestConfig) (*html.Node, error) {
+	if url.Scheme == "file" {
+		return LoadFile(url, userAgent, configs...)
+	}
+
 	request, err := http.NewRequest("GET", url.String(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to request: %w", err)
