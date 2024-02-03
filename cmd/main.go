@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/itzg/restify"
+	"github.com/comnoco/restify"
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
 	"gopkg.in/alecthomas/kingpin.v2"
