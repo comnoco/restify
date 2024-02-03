@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strings"
+
 	"github.com/itzg/restify"
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
 	"gopkg.in/alecthomas/kingpin.v2"
-	"log"
-	"os"
-	"strings"
 )
 
 var (
@@ -51,7 +52,9 @@ func main() {
 	if headers != nil {
 		configs = append(configs, restify.WithHeaders(*headers))
 	}
+
 	root, err := restify.LoadContent(*url, *userAgent, configs...)
+
 	if err != nil {
 		log.Fatal("Failed to load content: ", err)
 	}
