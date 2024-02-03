@@ -37,8 +37,8 @@ func LoadBuffer(buffer []byte) (*html.Node, error) {
 	return root, nil
 }
 
-func LoadReader(reader *io.Reader) (*html.Node, error) {
-	root, err := html.Parse(*reader)
+func LoadReader(reader io.Reader) (*html.Node, error) {
+	root, err := html.Parse(reader)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to parse reader: %w", err)
 	}
